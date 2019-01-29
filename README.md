@@ -13,7 +13,13 @@ Things you may want to cover:
 
 * Configuration
   - bundle install
-  - rails generate rspec:install
+  - rails g rspec:install
+
+* Documentation
+  - https://github.com/rspec/rspec-rails
+  - https://github.com/thoughtbot/factory_bot_rails
+  - http://jsonapi.org/
+
 
 * Database creation
 
