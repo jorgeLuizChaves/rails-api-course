@@ -19,6 +19,17 @@ Things you may want to cover:
   - https://github.com/rspec/rspec-rails
   - https://github.com/thoughtbot/factory_bot_rails
   - http://jsonapi.org/
+ 
+
+
+* Http Status Code
+  - 200 :ok
+  - 201 :created
+  - 204 :no_content
+  - 401 :not_authorized
+  - 403 :forbidden
+  - 404 :not_found
+  - 422 :unprocessable_entity
 
 
 * Database creation
