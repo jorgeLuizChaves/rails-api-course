@@ -25,4 +25,13 @@ RSpec.describe Article, type: :model do
       expect(invalid_article).not_to be_valid
     end  
   end
+
+  describe '.recent' do
+    it 'should list recent articles' do
+      oldest = create :article
+      newest = create :article
+      oldest.update_column :created_at, Time.now
+      expect(described_class.recent).to eq([oldest, newest])
+    end
+  end
 end

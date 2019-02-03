@@ -17,7 +17,10 @@ gem 'puma', '~> 3.11'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'rspec-rails', '~> 3.8'
 gem 'factory_bot_rails'
-gem 'active_model_serializers', '~> 0.10'
+# gem 'active_model_serializers', '~> 0.10'
+gem 'fast_jsonapi'
+gem 'kaminari'
+gem 'octokit', '~> 4.0'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'

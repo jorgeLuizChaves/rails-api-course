@@ -2,27 +2,38 @@ require 'rails_helper'
 
 describe ArticlesController do
   describe '#index' do
+    subject { get :index }
     it 'should return success response' do
-      get :index
+      subject
       expect(response).to have_http_status(:ok)
     end
 
     it 'should return proper json' do
       number_of_articles = 2
       create_list :article, number_of_articles
-      get :index
-      json = JSON.parse(response.body)
-      json_data = json['data']
+      subject
+      Article.recent.each_with_index do |article, index|
+        expect(json_data[index]['attributes']).to eq({
+          'title' => article.title,
+          'content' => article.content,
+          'slug' => article.slug
+        })
+      end
+    end
 
-      expect(json_data[0]['attributes']).to eq({
-                                                   'title' => "My awesome article #{1}",
-                                                   'content' => "The content of my awesome article #{1}",
-                                                   'slug' => "my-awesome-article-#{1}"})
+    it 'should return articles in the proper order' do
+      oldest = create :article
+      newest = create :article
+      subject
+      expect(json_data.first['id']).to eq(newest.id.to_s)
+      expect(json_data.last['id']).to eq(oldest.id.to_s)
+    end
 
-      expect(json_data[1]['attributes']).to eq({
-                                                   'title' => "My awesome article #{2}",
-                                                   'content' => "The content of my awesome article #{2}",
-                                                   'slug' => "my-awesome-article-#{2}"})
+    it 'should return paginated articles' do
+      articles = create_list :article, 9
+      get :index, params: {page: 1, per_page: 1}
+      expect(json_data.length).to eq 1
+      expect(json_data.first['id']).to eq articles.last.id.to_s
     end
   end
 end
