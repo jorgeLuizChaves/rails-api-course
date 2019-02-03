@@ -27,3 +27,4 @@
 
 # Ignore RubyMine files
 .idea/
+Gemfile.lock
