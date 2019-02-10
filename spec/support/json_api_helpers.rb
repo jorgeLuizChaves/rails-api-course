@@ -1,9 +1,13 @@
 module JsonApiHelpers
   def json
-    json = JSON.parse(response.body)
+    JSON.parse(response.body)
   end
 
   def json_data
-    json_data = json['data']
+    json['data']
+  end
+
+  def json_errors
+    json['errors']
   end
 end
