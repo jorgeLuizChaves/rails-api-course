@@ -31,7 +31,7 @@ RSpec.describe Article, type: :model do
       oldest = create :article
       newest = create :article
       oldest.update_column :created_at, Time.now
-      expect(described_class.recent).to eq([oldest, newest])
+      expect(described_class.recent).to eq([newest, oldest])
     end
   end
 end
