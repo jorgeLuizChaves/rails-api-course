@@ -2,6 +2,8 @@ class AccessTokensController < ApplicationController
 
   rescue_from UserAuthentication::UserAuthenticationError, with: :handle_user_authentication_error
 
+  skip_before_action :authorize!, only: [:create]
+
   def create
     user_authentication = UserAuthentication.new(params[:code])
     user_authentication.perform
@@ -9,7 +11,7 @@ class AccessTokensController < ApplicationController
   end
 
   def destroy
-    raise AuthorizationError
+    current_user.access_token.destroy
   end
 
   private

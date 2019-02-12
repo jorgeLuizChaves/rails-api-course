@@ -5,7 +5,22 @@ class ApplicationController < ActionController::API
   rescue_from UserAuthentication::UserAuthenticationError, with: :handle_user_authentication_error
   rescue_from AuthorizationError, with: :handle_authorization_error
 
+  before_action :authorize!
+
   private
+
+  def authorize!
+    raise AuthorizationError unless current_user
+  end
+
+  def current_user
+    @current_user = access_token&.user
+  end
+
+  def access_token
+    provided_token = request.authorization&.gsub(/\ABearer\s/,'')
+    @access_token = AccessToken.find_by(token: provided_token)
+  end
 
   def handle_user_authentication_error
     error = {
