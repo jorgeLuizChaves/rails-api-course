@@ -36,4 +36,55 @@ describe ArticlesController do
       expect(json_data.first['id']).to eq articles.last.id.to_s
     end
   end
+
+  describe '#show' do
+    let(:article) {
+      create :article
+    }
+
+    subject { get :show, params: {id: article.id}  }
+
+    it 'should return status code 200' do
+      subject
+      expect(response).to have_http_status :ok
+    end
+    it 'should retrieve an article by id' do
+      subject
+      expect(json_data['attributes']).to eq({
+          "title" => article.title,
+          "content" => article.content,
+          "slug" => article.slug
+      })
+    end
+
+    it 'should return :not_found to unregistred articles' do
+      get :show, params: {id: 99001}
+      expect(response).to have_http_status :not_found
+    end
+
+    it 'should return proper json when article is not found' do
+      get :show, params: {id: 99001}
+      error = {
+          "status" => "404",
+          "source" =>  { "pointer" => "/data/attributes/id" },
+          "title" =>   "Article Not Found",
+          "detail" => "This article does not exist in our registry"
+      }
+      expect(json_errors).to include(error)
+    end
+  end
+
+  describe "#create" do
+    subject { post :create }
+
+    context 'when no code provided' do
+      it_behaves_like 'forbidden_access'
+    end
+
+    context 'when invalid code provided' do
+      before { request.headers['authorization'] = 'Invalid token' }
+      it_behaves_like 'forbidden_access'
+    end
+
+  end
 end

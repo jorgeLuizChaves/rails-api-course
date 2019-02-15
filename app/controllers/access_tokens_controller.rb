@@ -1,7 +1,5 @@
 class AccessTokensController < ApplicationController
-
-  rescue_from UserAuthentication::UserAuthenticationError, with: :handle_user_authentication_error
-
+  
   skip_before_action :authorize!, only: [:create]
 
   def create
