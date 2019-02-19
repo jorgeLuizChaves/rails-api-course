@@ -86,5 +86,155 @@ describe ArticlesController do
       it_behaves_like 'forbidden_access'
     end
 
+    context 'when authorized' do
+      let(:access_token) { create :access_token }
+      before { request.headers['authorization'] =  "Bearer #{access_token.token}"}
+
+      context 'when invalid parameters provided' do
+        let(:invalid_attributes) do
+          {
+              data: {
+                  attributes: {
+                      title: nil,
+                      content: nil
+                  }
+              }
+          }
+        end
+        subject {post :create, params: invalid_attributes}
+
+        it 'should return 422 status code' do
+          subject
+          expect(response).to have_http_status :unprocessable_entity
+        end
+
+        it 'should return proper json' do
+          subject
+          expect(json_errors).to include(
+            {
+              "source" => { "pointer" => "/data/attributes/title" },
+              "detail" =>  "can't be blank"},
+            {
+              "source" => { "pointer" => "/data/attributes/content" },
+              "detail" =>  "can't be blank"
+            },
+            {
+              "source" => { "pointer" => "/data/attributes/slug" },
+              "detail" =>  "can't be blank"
+            })
+        end
+      end
+
+      context 'when valid parameters provide' do
+        let(:valid_attributes) do
+          {
+              data: {
+                  attributes: {
+                      title: "awesome article",
+                      content: "awesome content",
+                      slug: "awesome-article"
+                  }
+              }
+          }
+        end
+        subject {post :create, params: valid_attributes}
+
+        it 'should return 201 status code' do
+          subject
+          expect(response).to have_http_status :created
+        end
+
+        it 'should create an article' do
+          expect { subject }.to change { Article.count }.by 1
+        end
+      end
+    end
+  end
+
+  describe "#update" do
+    let(:article) do
+      create :article
+    end
+
+    let(:access_token_valid) do
+      create :access_token
+    end
+    let(:token) do
+      token = access_token_valid.token
+    end
+
+    let(:update_article) do
+      {
+          "data" => {
+              "attributes" => {
+                  "title" => "updated-title",
+                  "content" => "updated-content",
+                  "slug" => "updated-slug"
+              }
+          }
+      }
+    end
+
+    subject {patch :update, params: update_article.clone.merge(id: article.id)}
+
+    context 'when no code is provided' do
+      it_behaves_like 'forbidden_access'
+    end
+
+    context 'when invalid code is provided' do
+      before { request.headers['authorization'] = 'Invalid token'}
+      it_behaves_like 'forbidden_access'
+    end
+
+    context 'when valid code is provided' do
+      before { request.headers['authorization'] = "Bearer #{token}" }
+
+      it 'should return status code 200' do
+        subject
+        expect(response).to have_http_status :ok
+      end
+
+      it 'should return proper json' do
+        subject
+        # p response.body
+        expect(json_data).to include(update_article['data'])
+      end
+    end
+  end
+
+  describe "#destroy" do
+    let(:article) do
+      create :article
+    end
+    let(:access_token) do
+      create :access_token
+    end
+
+    let(:token) do
+      access_token.token
+    end
+
+    subject {delete :destroy, params: {id: article.id}}
+
+    context 'when no code is provided' do
+      it_behaves_like 'forbidden_access'
+    end
+
+    context 'when invalid code is provided' do
+      before { request.headers['authorization'] = 'Invalid token'}
+      it_behaves_like 'forbidden_access'
+    end
+
+    context 'when valid code is provided' do
+      before { request.headers['authorization'] = "Bearer #{token}"}
+
+      it 'should return status code ok' do
+        expect(response).to have_http_status :ok
+      end
+
+      it 'should remove an article' do
+        expect { subject }.to change{ Article.count }.by 0
+      end
+    end
   end
 end

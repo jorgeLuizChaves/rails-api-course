@@ -19,7 +19,26 @@ class ArticlesController < ApplicationController
   end
 
   def create
+    article = Article.new(article_params)
+    if article.valid?
+      article.save!
+      render json: serializer(article), status: :created
+    else
+      errors = article_unprocessable(article.errors.messages)
+      render json: { "errors" => errors },
+             status: :unprocessable_entity
+    end
+  end
 
+  def update
+    article = Article.find(params[:id])
+    article.update_attributes!(article_params)
+    render json: serializer(article), status: :ok
+  end
+
+  def destroy
+    Article.delete(params[:id])
+    head :no_content
   end
 
   private
@@ -35,5 +54,22 @@ class ArticlesController < ApplicationController
         "detail" => "This article does not exist in our registry"
     }
     render json: {"errors" => [ error ]}, status: :not_found
+  end
+
+  def article_unprocessable(messages)
+    errors = []
+    messages.each_pair do |k, v|
+      errors << {
+          "source" => { "pointer" => "/data/attributes/#{k}" },
+          "detail" => v[0]
+      }
+    end
+    errors
+  end
+
+  def article_params
+    params.require(:data).require(:attributes)
+        .permit(:title, :content, :slug) ||
+    ActionController::Parameters.new
   end
 end
