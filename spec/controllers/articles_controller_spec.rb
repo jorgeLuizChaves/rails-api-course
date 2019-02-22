@@ -126,13 +126,18 @@ describe ArticlesController do
       end
 
       context 'when valid parameters provide' do
+        let(:user) do
+          create :user
+        end
+
         let(:valid_attributes) do
           {
               data: {
                   attributes: {
                       title: "awesome article",
                       content: "awesome content",
-                      slug: "awesome-article"
+                      slug: "awesome-article",
+                      user: user
                   }
               }
           }
@@ -200,19 +205,19 @@ describe ArticlesController do
         expect(json_data).to include(update_article['data'])
       end
     end
+
+    context 'when user try to edit articles that not belong to him' do
+      let(:other_user) { create :user }
+      subject {delete :destroy, params: {id: other_user.id }}
+      it_behaves_like 'forbidden_access'
+    end
   end
 
   describe "#destroy" do
-    let(:article) do
-      create :article
-    end
-    let(:access_token) do
-      create :access_token
-    end
+    let(:user) { create :user }
+    let(:article) { create :article, user: user }
 
-    let(:token) do
-      access_token.token
-    end
+    let(:token) { user.create_access_token.token }
 
     subject {delete :destroy, params: {id: article.id}}
 
@@ -229,12 +234,21 @@ describe ArticlesController do
       before { request.headers['authorization'] = "Bearer #{token}"}
 
       it 'should return status code ok' do
-        expect(response).to have_http_status :ok
+        subject
+        expect(response).to have_http_status :no_content
       end
 
       it 'should remove an article' do
-        expect { subject }.to change{ Article.count }.by 0
+        article
+        expect { subject }.to change{ Article.count }.by -1
       end
+    end
+
+    context 'when trying to remove not owned article' do
+      before {request.headers["Authorization"] = "Bearer #{token}"}
+      let(:other_user) { create :user }
+      subject {delete :destroy, params: {id: other_user.id }}
+      it_behaves_like 'forbidden_access'
     end
   end
 end

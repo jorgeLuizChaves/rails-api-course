@@ -19,7 +19,7 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    article = Article.new(article_params)
+    article = current_user.articles.build(article_params)
     if article.valid?
       article.save!
       render json: serializer(article), status: :created
@@ -34,11 +34,16 @@ class ArticlesController < ApplicationController
     article = Article.find(params[:id])
     article.update_attributes!(article_params)
     render json: serializer(article), status: :ok
+    rescue ActiveRecord::RecordNotFound
+      handle_authorization_error
   end
 
   def destroy
-    Article.delete(params[:id])
+    article = current_user.articles.find(params[:id])
+    article.destroy
     head :no_content
+    rescue ActiveRecord::RecordNotFound
+      handle_authorization_error
   end
 
   private
