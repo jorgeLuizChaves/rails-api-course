@@ -42,4 +42,15 @@ class ApplicationController < ActionController::API
     }
     render json: {'errors' => [error]}, status: :forbidden
   end
+
+  def model_unprocessable(messages)
+    errors = []
+    messages.each_pair do |k, v|
+      errors << {
+          "source" => { "pointer" => "/data/attributes/#{k}" },
+          "detail" => v[0]
+      }
+    end
+    { "errors" => errors }
+  end
 end

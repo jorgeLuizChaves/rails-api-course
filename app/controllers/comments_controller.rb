@@ -1,4 +1,8 @@
 class CommentsController < ApplicationController
+  class CommentsNotFound < StandardError; end
+
+  rescue_from CommentsController::CommentsNotFound, with: :comments_not_found
+
   before_action :load_article
   skip_before_action :authorize!, only: [:index]
 
@@ -6,6 +10,7 @@ class CommentsController < ApplicationController
   def index
     @comments = @article
       .comments.page(params[:page]).per(params[:per_page])
+    raise CommentsNotFound if @comments.count == 0
     render json: serializer(@comments)
   end
 
@@ -16,7 +21,7 @@ class CommentsController < ApplicationController
     @comment.save!
     render json: serializer(@comment), status: :created, location: @article
   rescue
-      render json: @comment.errors, status: :unprocessable_entity
+      render json:  model_unprocessable(@comment.errors.messages), status: :unprocessable_entity
   end
 
   private
@@ -32,5 +37,16 @@ class CommentsController < ApplicationController
     def comment_params
       params.require(:data).require('attributes').permit(:content) ||
           ActionController::Parameters.new
+    end
+
+    def comments_not_found
+      error = {
+          "status" => "404",
+          "source" =>  { "pointer" => "/data/attributes/id" },
+          "title" =>   "Comments Not Found",
+          "detail" => "This article does not have any comment"
+      }
+      render json: { "errors" => [ error ] },
+             status: :not_found
     end
 end

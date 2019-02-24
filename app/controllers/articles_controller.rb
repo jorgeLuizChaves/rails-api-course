@@ -24,9 +24,8 @@ class ArticlesController < ApplicationController
       article.save!
       render json: serializer(article), status: :created
     else
-      errors = article_unprocessable(article.errors.messages)
-      render json: { "errors" => errors },
-             status: :unprocessable_entity
+      errors = model_unprocessable(article.errors.messages)
+      render json: errors , status: :unprocessable_entity
     end
   end
 
@@ -59,17 +58,6 @@ class ArticlesController < ApplicationController
         "detail" => "This article does not exist in our registry"
     }
     render json: {"errors" => [ error ]}, status: :not_found
-  end
-
-  def article_unprocessable(messages)
-    errors = []
-    messages.each_pair do |k, v|
-      errors << {
-          "source" => { "pointer" => "/data/attributes/#{k}" },
-          "detail" => v[0]
-      }
-    end
-    errors
   end
 
   def article_params
