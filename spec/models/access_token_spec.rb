@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe AccessToken, type: :model do
-  describe '.validations' do
+
+  describe '#validations' do
     it 'should have valid factory' do
       token = build :access_token
       expect(token).to be_valid
