@@ -5,6 +5,8 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-Article.create([{title: "My awesome article 1", content: "The content of my awesome article 1", slug: "my-awesome-article-1" },
-                {title: "My awesome article 2", content: "The content of my awesome article 2", slug: "my-awesome-article-2" },
-                {title: "My awesome article 3", content: "The content of my awesome article 3", slug: "my-awesome-article-3" }])
+user = User.create({login: "jonh-connor", provider: "github"})
+
+Article.create([{title: "My awesome article 1", content: "The content of my awesome article 1", slug: "my-awesome-article-1", user: user },
+                {title: "My awesome article 2", content: "The content of my awesome article 2", slug: "my-awesome-article-2", user: user },
+                {title: "My awesome article 3", content: "The content of my awesome article 3", slug: "my-awesome-article-3", user: user }])
