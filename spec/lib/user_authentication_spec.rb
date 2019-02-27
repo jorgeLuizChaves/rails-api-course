@@ -1,6 +1,15 @@
 require 'rails_helper'
 
 describe UserAuthentication do
+
+  context 'when login is by oauth' do
+
+  end
+
+  context 'when authentication is by user and password' do
+
+  end
+
   describe '#perform' do
     let(:authenticator) { described_class.new('sample_code') }
     subject { authenticator.perform }

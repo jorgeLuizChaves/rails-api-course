@@ -85,7 +85,3 @@ RSpec.describe AccessTokensController, type: :controller do
     end
   end
 end
-
-# valid
-# 204
-# should remove accesstoken
