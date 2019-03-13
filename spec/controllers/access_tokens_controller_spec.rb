@@ -23,6 +23,7 @@ RSpec.describe AccessTokensController, type: :controller do
 
     context 'when request is valid' do
       subject {post :create, params: {code: 'valid_code'}}
+
       let(:user_data) do
         {
             login: 'jconnor1',

@@ -8,15 +8,15 @@ class UserAuthentication::Oauth < UserAuthentication
   end
 
   def perform
-    raise UserAuthenticationError if code.blank?
-    raise UserAuthenticationError if token.try(:error).present?
+    raise UserAuthentication::Oauth::UserAuthenticationError if code.blank?
+    raise UserAuthentication::Oauth::UserAuthenticationError if token.try(:error).present?
 
     prepare_user
     @access_token = if user.access_token.present?
-                      user.access_token
-                    else
-                      user.create_access_token
-                    end
+        user.access_token
+    else
+        user.create_access_token
+    end
   end
 
   private

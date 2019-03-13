@@ -1,14 +1,22 @@
 class UserAuthentication
   class UserAuthenticationError < StandardError; end
 
-  attr_reader :user, :access_token, :authentication
+  attr_reader :user, :authentication
 
-  def initialize(code = nil)
-    @authentication = Oauth.new(code)
+  def initialize(code: nil, login: nil, password: nil)
+    @authentication = if code.present?
+      Oauth.new(code)
+    else
+      Standard.new(login, password)
+    end
   end
 
   def perform
     authentication.perform
+  end
+
+  def access_token
+    authentication.access_token
   end
 
   private

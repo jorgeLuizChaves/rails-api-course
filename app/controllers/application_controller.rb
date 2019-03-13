@@ -2,7 +2,10 @@ class ApplicationController < ActionController::API
 
   class AuthorizationError < StandardError; end
 
-  rescue_from UserAuthentication::UserAuthenticationError, with: :handle_user_authentication_error
+  rescue_from UserAuthentication::UserAuthenticationError,
+              UserAuthentication::Standard::AuthenticationError,
+              UserAuthentication::Oauth::UserAuthenticationError,
+              with: :handle_user_authentication_error
   rescue_from AuthorizationError, with: :handle_authorization_error
 
   before_action :authorize!
