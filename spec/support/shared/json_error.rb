@@ -1,5 +1,26 @@
 require 'rails_helper'
 
+shared_examples_for "unauthorized_standard_requests" do
+  let(:error) do
+    {
+        "status" => "401",
+        "source" => { "pointer" => "/data/attributes/password" },
+        "title"  => "Invalid login or password",
+        "detail" => "You must provide valid credentials in order to exchange them for token."
+    }
+  end
+
+  it 'should return status code unauthorized' do
+    subject
+    expect(response).to have_http_status :unauthorized
+  end
+
+  it 'should return proper json code' do
+    subject
+    expect(json_errors).to include(error)
+  end
+end
+
 shared_examples_for "unauthorized_requests" do
   let(:error) do
     {
