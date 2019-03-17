@@ -58,7 +58,6 @@ RSpec.describe RegistrationsController do
 
       it 'should return proper json' do
         post :create, params: params_invalid
-        p json_errors
         expect(json_errors).to include(expected_json_error)
       end
     end
