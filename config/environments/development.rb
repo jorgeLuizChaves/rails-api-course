@@ -52,3 +52,8 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 end
+
+config.log_level = :info
+config.lograge.enabled = true
+config.lograge.formatter = Lograge::Formatters::Logstash.new
+config.logger = LogStashLogger.new(type: :tcp, host: 'logstash.example.com', port: 2020)

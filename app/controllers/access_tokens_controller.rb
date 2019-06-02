@@ -3,13 +3,19 @@ class AccessTokensController < ApplicationController
   skip_before_action :authorize!, only: [:create]
 
   def create
-    user_authentication = UserAuthentication.new(authentication_params)
-    user_authentication.perform
-    render json: AccessTokenSerializer.new(user_authentication.access_token).serialized_json, status: :created
+    STATSD.time("token.create") do
+      STATSD.increment 'token.create.count'
+      user_authentication = UserAuthentication.new(authentication_params)
+      user_authentication.perform
+      render json: AccessTokenSerializer.new(user_authentication.access_token).serialized_json, status: :created
+    end    
   end
 
   def destroy
-    current_user.access_token.destroy
+    STATSD.time("token.destroy") do
+      STATSD.increment 'token.destroy.count'
+      current_user.access_token.destroy
+    end
   end
 
   private

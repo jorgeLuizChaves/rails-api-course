@@ -3,11 +3,15 @@ class RegistrationsController < ApplicationController
   skip_before_action :authorize!, only: [:create]
 
   def create
-    user = User.new(user_params.merge(provider: 'standard'))
-    user.save!
-    render json: serializer(user), status: :created
-  rescue
-    render json:  model_unprocessable(user.errors.messages), status: :unprocessable_entity
+    STATSD.time("token.create") do
+      user = User.new(user_params.merge(provider: 'standard'))
+      user.save!
+      STATSD.increment "token.create.count"
+      render json: serializer(user), status: :created
+    rescue
+      STATSD.increment "token.create.error.count"
+      render json:  model_unprocessable(user.errors.messages), status: :unprocessable_entity
+    end
   end
 
   private

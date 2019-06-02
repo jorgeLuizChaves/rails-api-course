@@ -35,7 +35,7 @@ gem 'bcrypt'
 # gem 'rack-cors'
 
 group :production do
-  gem 'pg' #postgres db required by heroku default
+  # gem 'pg' #postgres db required by heroku default
 end
 
 group :development, :test do
@@ -58,3 +58,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # StatsD
 gem 'statsd-ruby'
+
+# Logging 
+gem 'lograge'
+gem 'logstash-event'
+gem 'logstash-logger'

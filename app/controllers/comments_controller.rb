@@ -8,20 +8,27 @@ class CommentsController < ApplicationController
 
   # GET /article/{article_id}/comments
   def index
-    @comments = @article
+    STATSD.time("comments.index.count") do
+      @comments = @article
       .comments.page(params[:page]).per(params[:per_page])
     raise CommentsNotFound if @comments.count == 0
     render json: serializer(@comments)
+    end
+    end
   end
 
   # POST /article/{article_id}/comments
   def create
-    @comment = @article.comments
+    STATSD.time("comments.create") do
+          @comment = @article.comments
         .build comment_params.merge(user: current_user)
     @comment.save!
+    STATSD.increment "comments.create.count"
     render json: serializer(@comment), status: :created, location: @article
   rescue
+      STATSD.increment "comments.create.error.count"
       render json:  model_unprocessable(@comment.errors.messages), status: :unprocessable_entity
+    end
   end
 
   private
