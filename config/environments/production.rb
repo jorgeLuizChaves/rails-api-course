@@ -82,9 +82,11 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  config.log_level = :info
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Logstash.new
+  config.logger = LogStashLogger.new(type: :tcp, host: 'logstash.example.com', port: 2020)
 end
 
-config.log_level = :info
-config.lograge.enabled = true
-config.lograge.formatter = Lograge::Formatters::Logstash.new
-config.logger = LogStashLogger.new(type: :tcp, host: 'logstash.example.com', port: 2020)
+
